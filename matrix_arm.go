@@ -1,3 +1,5 @@
+// +build arm,armbe,arm64,arm64be
+
 package rgbmatrix
 
 /*
