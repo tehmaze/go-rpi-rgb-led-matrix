@@ -57,6 +57,8 @@ type HardwareConfig struct {
 	// This won't do anything if output enable is not connected to GPIO 18 in
 	// non-standard wirings.
 	DisableHardwarePulsing bool
+	// SkipInit is used for the emulator.
+	SkipInit bool
 
 	ShowRefreshRate bool
 	InverseColors   bool
