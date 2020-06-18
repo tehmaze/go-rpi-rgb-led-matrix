@@ -2,9 +2,8 @@
 
 package rgbmatrix
 
-import "github.com/tehmaze/go-rpi-rgb-led-matrix/emulator"
+import "github.com/tehmaze/go-rpi-rgb-led-matrix/textemulator"
 
 func newRGBLedMatrix(config *HardwareConfig) (Matrix, error) {
-	w, h := config.geometry()
-	return emulator.NewEmulator(w, h, emulator.DefaultPixelPitch, !config.SkipInit), nil
+	return textemulator.New(config.geometry())
 }
