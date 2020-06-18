@@ -1,9 +1,9 @@
 package rgbmatrix
 
 /*
-#cgo CFLAGS: -std=c99 -I${SRCDIR}/vendor/rpi-rgb-led-matrix/include -DSHOW_REFRESH_RATE
-#cgo LDFLAGS: -lrgbmatrix -L${SRCDIR}/vendor/rpi-rgb-led-matrix/lib -lstdc++ -lm
-#include <led-matrix-c.h>
+#cgo CFLAGS: -std=c99 -I${SRCDIR}/upstream/rpi-rgb-led-matrix/include -DSHOW_REFRESH_RATE
+#cgo LDFLAGS: -lrgbmatrix -L${SRCDIR}/upstream/rpi-rgb-led-matrix/lib -lstdc++ -lm
+#include "led-matrix-c.h"
 
 void led_matrix_swap(struct RGBLedMatrix *matrix, struct LedCanvas *offscreen_canvas,
                      int width, int height, const uint32_t pixels[]) {
@@ -76,7 +76,7 @@ func (c *HardwareConfig) toC() *C.struct_RGBLedMatrixOptions {
 	return o
 }
 
-func newRGBLedMatrix(config *HardwareConfig) (Matrix, error) {
+func newRGBLedMatrix(config *HardwareConfig) (matrix Matrix, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			var ok bool
@@ -89,19 +89,20 @@ func newRGBLedMatrix(config *HardwareConfig) (Matrix, error) {
 
 	w, h := config.geometry()
 	m := C.led_matrix_create_from_options(config.toC(), nil, nil)
+	if m == nil {
+		return nil, fmt.Errorf("unable to allocate memory")
+	}
 	b := C.led_matrix_create_offscreen_canvas(m)
-	c = &rgbLedMatrix{
+	if b == nil {
+		return nil, fmt.Errorf("unable to allocate memory")
+	}
+	return &rgbLedMatrix{
 		Config: config,
 		width:  w, height: h,
 		matrix: m,
 		buffer: b,
 		leds:   make([]C.uint32_t, w*h),
-	}
-	if m == nil {
-		return nil, fmt.Errorf("unable to allocate memory")
-	}
-
-	return c, nil
+	}, nil
 }
 
 // rgbLedMatrix matrix representation for ws281x
